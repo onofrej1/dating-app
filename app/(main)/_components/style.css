@@ -1,0 +1,18 @@
+.footer {
+  border-top: 1px solid gray;
+  height: 150px;
+  color: black;
+  background-size: cover;
+  background-image: url("./../../../public/images/footer.jpg");
+}
+
+.fade-img {
+  mask-image: linear-gradient(to right, white 30%, transparent);
+}
+
+.blur {
+  background: rgba(255, 255, 255, 0.2);
+  backdrop-filter: blur(3px);
+  height: 100vh;
+  width: 50%;
+}

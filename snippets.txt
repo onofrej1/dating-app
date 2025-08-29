@@ -1,0 +1,379 @@
+/*export interface DataService<T extends Table> {
+  getAll: (
+    pagination: Pagination,
+    search: Search<T>,
+    orderBy: OrderBy[]
+  ) => Promise<GetAllReturnType<T>>;
+  getOptions: () => Promise<{ value: number, label: string }[]>,
+  get: (id: number) => Promise<InferSelectModel<T> | undefined>;
+  create: (data: InferInsertModel<T> & { [k: string]: any }) => Promise<QueryResult>;
+  update: (data: InferInsertModel<T>) => Promise<QueryResult>;
+  delete: (id: string) => Promise<T>;
+}*/
+
+export type GetAllReturnType<T extends Table> = [InferSelectModel<T>[], number];
+
+/*export async function create(resource: Resource, data: Record<string, unknown>) {
+  const service = await getDataService(resource);
+  type P = Parameters<typeof service['save']>;
+  if (isDataOfType('categories', data)) {
+    service.save(data as P);
+  }
+}*/
+
+          {/* data?.questions.filter(q => q.id === activeQuestion).map((question) => (*/
+
+
+//type Par = unknown; // NewCategory | NewTag | NewPost | NewUser;
+//Parameters<typeof categoryService.update>;
+/*| Parameters<typeof tagService.update>
+  | Parameters<typeof userService.update>
+  | Parameters<typeof postService.update>;*/
+
+//export async function update(resource: Resource, data: Par) {
+//  const service = await getDataService(resource);
+//  const method = categoryService.update;
+//if (isDataOfType1(categoryService.update, data)) {
+//categoryService.update(data as NewCategory);
+//}
+//categoryService.update(data);
+//  service.update(data);
+//}
+
+type AllowedMethods = any;
+type IDataService<TService> = Record<Exclude<keyof TService, 'PATH'>, AllowedMethods>
+
+type FunctionPropertyNames<T> = {
+  [K in keyof T]: T[K] extends Function ? K : never
+}[keyof T]
+export type FunctionProperties<T> = Pick<T, FunctionPropertyNames<T>>
+
+const gDataService = <
+    TService extends IDataService<TService>,
+    TMethod extends FunctionPropertyNames<TService>
+>
+    (service: TService, methodName: TMethod) => {
+
+    const method: FunctionProperties<TService>[TMethod] = service[methodName];
+
+    const run = async (...params: Parameters<typeof method>) => {
+        await method.apply(service, params);
+    };
+
+    return { run };
+};
+
+const services1 = {
+  categories: gDataService(categoryService, 'update'),
+  tags: gDataService(tagService, 'update'),
+  posts: gDataService(postService, 'update'),
+};
+
+const runMethod = (entity: 'categories' | 'posts' | 'tags') => {
+  //services1[entity].run({ name: 'eee' });
+}
+
+
+if (resource === "categories" && isDataOfType("categories", data)) {
+    categoryService.upsert(data);
+  } else if (resource === "tags" && isDataOfType("tags", data)) {
+    tagService.upsert(data);
+  } else if (resource === "posts" && isDataOfType("posts", data)) {
+    postService.upsert(data);
+  }
+
+  /*for (const value of valuesArray) {
+      if (values[value.toString()]?.length === 5) {
+        score["yahtzee"] = 50;
+      }
+    }*/
+
+    /*if (keys.length === 2) {
+      score["fourOfKind"] = 50;
+    }*/
+
+    const bgColor = () => {
+    return "#" + Math.floor(Math.random() * 16777215).toString(16);
+  };
+
+  const navItems = [
+    {
+      name: "Domov",
+      link: "/",
+      icon: <Home className="h-4 w-4 text-neutral-500 dark:text-white" />,
+    },
+    {
+      name: "Terminovka",
+      link: "/about",
+      icon: <User className="h-4 w-4 text-neutral-500 dark:text-white" />,
+    },
+    {
+      name: "Vysledky",
+      link: "/contact",
+      icon: (
+        <MessageSquare className="h-4 w-4 text-neutral-500 dark:text-white" />
+      ),
+    },
+    {
+      name: "Kontakt",
+      link: "/contact",
+      icon: (
+        <MessageSquare className="h-4 w-4 text-neutral-500 dark:text-white" />
+      ),
+    },
+  ];
+
+  {/*<FormField
+              control={form.control}
+              name={name}
+              render={({ field }) => (
+                <>
+                  <DateTimePicker
+                    displayFormat={formField.displayFormat}
+                    granularity={formField.granularity || "day"}
+                    label={label}
+                    field={field}
+                    className={className}
+                  />
+                </>
+              )}
+            />*/}
+
+            {/*type === "datetime-picker" && (
+          <FormField
+            control={form.control}
+            name={name}
+            render={({ field }) => (
+              <DateTimePicker
+                granularity="second"
+                label={label}
+                field={field}
+                className={className}
+              />
+            )}
+          />
+        )*/}
+
+<div
+            className="text-xl border border-gray-400 rounded-xl p-3 bg-white"
+            key={user.id}
+          >
+            {user.nickname}
+            {user.userInfo.map((u) => {
+              return (
+                <div key={u.id}>
+                  q:{u.questionId} - {u.questionChoice?.title}
+                </div>
+              );
+            })}
+          </div>*/}
+
+          <Form {...form}>
+        <form onSubmit={form.handleSubmit(onSubmit)}>
+          {data?.questions.map((question) => (
+            <FormItem key={question.id} className="border border-gray-300 p-3">
+              <div className="my-6 text-3xl font-bold">{question.title}</div>
+              <div className="flex flex-col gap-4">
+                {question.allowMultiple &&
+                  question.questionChoices.map((choice) => (
+                    <FormField
+                      key={choice.id}
+                      control={form.control}
+                      name={"question-" + question.id + ""}
+                      render={({ field }) => {
+                        const value = field.value as number[];
+
+                        return (
+                          <FormItem
+                            key={choice.id}
+                            className="flex flex-row items-center gap-2"
+                          >
+                            <FormControl>
+                              <Checkbox
+                                checked={value?.includes(choice.id)}
+                                onCheckedChange={(checked) => {
+                                  return checked
+                                    ? field.onChange([
+                                        ...(value || []),
+                                        choice.id,
+                                      ])
+                                    : field.onChange(
+                                        value.filter(
+                                          (value) => value !== choice.id
+                                        )
+                                      );
+                                }}
+                              />
+                            </FormControl>
+                            <FormLabel className="pl-4 text-2xl font-normal">
+                              {choice.title}
+                            </FormLabel>
+                          </FormItem>
+                        );
+                      }}
+                    />
+                  ))}
+
+                {!question.allowMultiple && (
+                  <FormField
+                    key={question.id}
+                    control={form.control}
+                    name={"question-" + question.id}
+                    render={({ field }) => {
+                      //console.log(field);
+                      return (
+                        <FormItem>
+                          {/*<FormLabel>{question.title}</FormLabel>*/}
+                          <FormControl>
+                            <Select
+                              name={field.name}
+                              onValueChange={field.onChange}
+                              defaultValue={field.value?.toString()}
+                              //value={field.value}
+                            >
+                              <SelectTrigger className="w-full">
+                                <SelectValue placeholder="Please choose" />
+                              </SelectTrigger>
+                              <SelectContent>
+                                {question.questionChoices.map((choice) => (
+                                  <SelectItem
+                                    key={choice.id}
+                                    value={choice.id.toString()}
+                                  >
+                                    {choice.title}
+                                  </SelectItem>
+                                ))}
+                              </SelectContent>
+                            </Select>
+                          </FormControl>
+                        </FormItem>
+                      );
+                    }}
+                  />
+                )}
+              </div>
+            </FormItem>
+          ))}
+
+          const nextQuestion = () => {
+    //setQuestion(data?.questions[activeQuestion + 1]);
+    //setActiveQuestion((q) => q + 1);
+  };
+
+  const prevQuestion = () => {
+    //setQuestion(data?.questions[activeQuestion - 1]);
+    //setActiveQuestion((q) => q - 1);
+  };
+
+  {/*data?.questions && (
+        <div className="flex mt-6 gap-3">
+          <Button
+            variant={"outline"}
+            //disabled={0 === activeQuestion}
+            type="button"
+            onClick={prevQuestion}
+          >
+            Previous
+          </Button>
+
+          <Button
+            variant={"outline"}
+            //disabled={data?.questions.length - 1 === activeQuestion}
+            type="button"
+            onClick={nextQuestion}
+          >
+            Next
+          </Button>
+
+          <Button type="submit">Save profile</Button>
+        </div>
+      )*/}
+
+      //const [activeQuestion, setActiveQuestion] = useState<number>(0);
+  /*const [question, setQuestion] = useState<
+    Question & { questionChoices: QuestionChoice[] }
+  >();*/
+
+  const getDays = () =>
+  Array.from({ length: 31 }, (_, i) => ({
+    value: (i + 1).toString(),
+    label: (i + 1).toString(),
+  }));
+
+const getMonths = () =>
+  Array.from(Array(12), (e, i) =>
+    new Date(25e8 * ++i).toLocaleString("en-US", { month: "short" })
+  ).map((v, i) => ({ label: v, value: (i + 1).toString() }));
+
+const getYears = (startYear: number = 1950) => {
+  const currentYear = new Date().getFullYear(),
+    years = [];
+  while (startYear <= currentYear) {
+    years.push(startYear++);
+  }
+  return years.map((y) => ({ label: y.toString(), value: y.toString() }));
+};
+
+const getImageDimensions = (
+    url: string
+  ): Promise<{ width: number; height: number }> => {
+    return new Promise((resolve, reject) => {
+      const img = new Image();
+      img.onload = () =>
+        resolve({
+          width: img.width,
+          height: img.height,
+        });
+      img.onerror = (error) => reject(error);
+      img.src = url;
+    });
+  };
+
+  interface DataMap {
+  categories: Category;
+  posts: Post;
+  //users: NewUser;
+  tags: Tag;
+}
+
+const resourceData = {
+  categories: "categories",
+  posts: "posts",
+  tags: "tags",
+  users: "user",
+};
+
+export const isDataOfType = <K extends keyof DataMap>(
+  resourceType: K,
+  data: unknown
+): data is DataMap[K] => {
+  return typeof data === resourceData[resourceType];
+};
+
+/**
+ * model Conversation {
+ * id           Int           @id @default(autoincrement())
+ * userId       String
+ * user         User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+ * timeStarted  DateTime
+ * timeClosed   DateTime
+ * participants Participant[]
+ * }
+ * model Participant {
+ * id             Int           @id @default(autoincrement())
+ * conversationId Int
+ * conversation   Conversation  @relation(fields: [conversationId], references: [id], onDelete: Cascade)
+ * userId         String
+ * user           User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+ * timeJoined     DateTime
+ * timeLeft       DateTime
+ * messages       ChatMessage[]
+ * }
+ * model ChatMessage {
+ * id            Int         @id @default(autoincrement())
+ * participantId Int
+ * participant   Participant @relation(fields: [participantId], references: [id], onDelete: Cascade)
+ * message       String
+ * addedAt       DateTime
+ * }
+ */
