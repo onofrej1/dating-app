@@ -1,3 +1,9 @@
+export enum Countries {
+  CZ = "Zahraničie - Česká republika",
+  SK = "Slovensko",
+  UAT = "Zahriničie - Rakúsko",  
+}
+
 export enum Regions {
   KE = "Košický",
   BA = "Bratislavský",

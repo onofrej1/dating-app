@@ -3,6 +3,7 @@ import { startConversation } from "@/actions/chat";
 import { getUsers } from "@/actions/users";
 import { Button } from "@/components/ui/button";
 import UserFilter, { Filter } from "@/components/user-filter";
+import { Countries, Regions } from "@/lib/countries";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { Mars, User, Venus } from "lucide-react";
 import Image from "next/image";
@@ -49,42 +50,57 @@ export default function UsersPage() {
         {users?.map((user) => (
           <div
             key={user.id}
-            className="relative flex flex-col md:flex-row w-full bg-white shadow-sm border border-slate-200 rounded-lg"
+            className="relative flex w-full bg-white shadow-sm border border-slate-200 rounded-lg"
           >
-            <div className="relative p-2.5 md:w-2/5 shrink-0 overflow-hidden">
+            <div className="relative shrink-0 overflow-hidden p-4">
               <Image
-                src="/images/avatar.png"
+                src={"/images/"+(user.gender === 'man' ? 'man.png' : 'woman.png')}
                 alt="card-image"
                 width={100}
                 height={100}
                 className="h-full w-full rounded-md md:rounded-lg object-cover"
               />
             </div>
-            <div className="p-6">
+            <div className="p-3">
               <h4 className="flex gap-2 items-center mb-2 text-slate-800 text-xl font-semibold">
-                <User /> {user.nickname}, <span>{user.gender}</span>
+                {/*<User />*/} {user.nickname}, <span>{user.gender === 'man' ? 'muž' : 'žena'}</span>
                 {user.gender === "man" ? <Mars /> : <Venus />}
               </h4>
-              <div className="mb-8 text-slate-600 leading-normal font-light">
+              {/*<div className="mb-8 text-slate-600 leading-normal font-light">
                 Like so many organizations these days, Autodesk is a company in
                 transition. It was until recently a traditional boxed software
                 company selling licenses. Yet its own business model disruption
                 is only part of the story
+              </div>*/}
+              <div className="flex flex-col gap-2">
+                <div>
+                  <strong>Vek:</strong> {user.dob ? getAge(user.dob) : null}
+                </div>
+                <div>
+                  <strong>Lokalita:</strong>{" "}
+                  {user.userLocation?.country ? (
+                    <span>
+                      {
+                        Countries[
+                          user.userLocation.country as keyof typeof Countries
+                        ]
+                      }
+                    </span>
+                  ) : null}{" "}
+                  {user.userLocation?.region ? (
+                    <span>/ {Regions[user.userLocation.region]} kraj</span>
+                  ) : null}{" "}
+                  {user.userLocation?.city ? (
+                    <span>({user.userLocation.city})</span>
+                  ) : null}
+                </div>
+
+                <div>
+                  <strong>Naposledy prihlaseny:</strong>{" "}
+                  {user.lastLogin?.toLocaleDateString()}
+                </div>
               </div>
-              <div>
-                <strong>Vek:</strong> {user.dob ? getAge(user.dob) : null}
-              </div>
-              <div>
-                <strong>Vzdelanie:</strong>
-              </div>
-              <div>
-                <strong>Aktualna poloha:</strong>
-              </div>
-              <div>
-                <strong>Naposledy prihlaseny:</strong>{" "}
-                {user.lastLogin?.toLocaleDateString()}
-              </div>
-              {user.email}
+
               <Button onClick={() => startUserConversation(user.id)}>
                 Send message
               </Button>

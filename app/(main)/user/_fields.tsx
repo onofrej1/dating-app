@@ -1,12 +1,14 @@
 import { Question, QuestionChoice } from "@/generated/prisma";
-import {
-  getCityOptions,
-  regionOptions,
-} from "@/lib/countries";
+import { getCityOptions, regionOptions } from "@/lib/countries";
 import { FormField } from "@/types/resources";
 
 const getOptions = (choices: QuestionChoice[]) => {
-  return choices.map((d) => ({ value: d.id.toString(), label: d.title }));
+  const options = choices.map((d) => ({
+    value: d.id.toString(),
+    label: d.title,
+  }));
+  options.unshift({ value: "all", label: "Nechcem uviesť" });
+  return options;
 };
 
 type GetUserFieldsProps = {
@@ -14,7 +16,6 @@ type GetUserFieldsProps = {
 };
 
 export const useUserFields = (props?: GetUserFieldsProps) => {
-
   const fields = [
     {
       name: "gender",
@@ -85,12 +86,15 @@ export const useUserFields = (props?: GetUserFieldsProps) => {
   props?.questions?.forEach((question) => {
     const type = {
       select: "select",
+      "multiple-select": "select",
+      //'multiple-select': 'multiple-select',
       "checkbox-group": "checkbox-group",
     } as const;
     fields.push({
       name: question.name,
       type: type[question.type as keyof typeof type],
       label: question.title,
+      //placeholder: 'Nechcem uviesť',
       options: getOptions(question.questionChoices),
     });
   });

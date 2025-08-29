@@ -7,6 +7,8 @@ import { Button } from "@/components/ui/button";
 import { FormField } from "@/types/resources";
 import { default as BaseForm, DefaultFormData } from "@/components/form/form";
 import { useUserFields } from "./_fields";
+import { UserInfo } from "@/validation";
+import { zodResolver } from "@hookform/resolvers/zod";
 //import z from "zod";
 //import { zodResolver } from "@hookform/resolvers/zod";
 
@@ -16,13 +18,17 @@ import { useUserFields } from "./_fields";
   }),*/
 //});
 
-type FormType = Record<string, number | number[]>;
+//type FormType = Record<string, string | number | number[]>;
+type FormType = {
+  gender: 'man' | 'woman';
+  dob: Date;
+}
 
 export default function UserPage() {
   const [formData, setFormData] = useState<DefaultFormData>();
-  const form = useForm<FormType>({
-    //resolver: zodResolver(FormSchema),
-  });
+  /*const form = useForm<FormType>({
+    resolver: zodResolver(UserInfo),
+  });*/
 
   const [initialized, setInitialized] = useState(false);
 
@@ -37,6 +43,7 @@ export default function UserPage() {
 
   useEffect(() => {
     if (formFields.length === 0 && data?.questions?.length) {
+      console.log(fields);
       setFormFields(fields);
     }
   }, [formFields, fields, data?.questions?.length]);
@@ -44,7 +51,7 @@ export default function UserPage() {
   useEffect(() => {
     if (data?.questions && data.questions.length > 0) {
       const defaultData: Record<string, unknown> = data.userInfo;
-      //console.log("default data", defaultData);
+      console.log("default data", defaultData);
 
       if (defaultData.dob) {
         const date = defaultData.dob as Date;
@@ -56,7 +63,7 @@ export default function UserPage() {
       setFormData(defaultData as DefaultFormData);
       setInitialized(true);
     }
-  }, [data, form]);
+  }, [data]);
 
   if (isFetching || !initialized) return <div>Loading...</div>;
 
@@ -66,9 +73,10 @@ export default function UserPage() {
         <BaseForm
           fields={formFields}
           data={formData}
+          validation={UserInfo}
           action={async (data) => {
             console.log(data);
-            saveUserInfo(data as FormType);
+            //saveUserInfo(data as FormType);
             return data;
           }}
         >
@@ -82,7 +90,9 @@ export default function UserPage() {
                 <div className="flex-1">{fields.dob}</div>
               </div>
 
-              {fields["country-cascader"]}
+              <div className="border border-gray-400 border-dashed p-4">
+                {fields["country-cascader"]}
+              </div>
               {fields.bio}
 
               <h3 className="scroll-m-20 text-2xl font-semibold tracking-tight">

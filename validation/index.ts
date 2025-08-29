@@ -74,12 +74,18 @@ export const ResetPassword = z.object({
   password: emailValue,
 });
 
+export const UserInfo = z.object({
+  gender: z.string().min(1, 'Pole je povinne'), //., "Please enter a valid value")
+  dob: z.string().min(1, 'Pole je povinne'),
+});
+
 export const ChangePassword = z.object({
   password: stringValue,
   confirmPassword: stringValue,
 });
 
 export type Rules =
+  | typeof UserInfo
   | typeof RegisterUser
   | typeof LoginUser
   | typeof UpdateUser

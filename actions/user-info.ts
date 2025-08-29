@@ -85,11 +85,11 @@ export async function saveUserInfo(
     if (!session?.user.id) return;
   
     const questions = await prisma.question.findMany();
-    await prisma.userInfo.deleteMany({
+    /*await prisma.userInfo.deleteMany({
       where: {
         userId: session.user.id,
       },
-    });
+    });*/
   
     await prisma.user.update({
       where: {
@@ -125,7 +125,17 @@ export async function saveUserInfo(
     for (const question of questions) {
       if (data[question.name]) {
         const entry = data[question.name];
-        //console.log("entry", question.id, entry);
+        console.log("entry", question.id, entry);
+        if (!entry || entry === 'all') {
+          await prisma.userInfo.deleteMany({
+            where: {
+              userId: session.user.id,
+              questionId: question.id,
+            },
+          });
+          continue;
+        }
+
         if (Array.isArray(entry) && entry.length > 0) {
           for (const choice of entry) {
             await prisma.userInfo.upsert({
