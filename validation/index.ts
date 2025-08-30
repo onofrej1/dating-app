@@ -75,8 +75,10 @@ export const ResetPassword = z.object({
 });
 
 export const UserInfo = z.object({
-  gender: z.string().min(1, 'Pole je povinne'), //., "Please enter a valid value")
-  dob: z.string().min(1, 'Pole je povinne'),
+  gender: z.string('Pole "pohlavie" je povinne'), //., "Please enter a valid value")
+  dob: z.date('Pole "datum narodenia" je povinne'),
+  country: z.string('Pole "krajina" je povinne'),
+  //region: z.string('Pole je povinne')
 });
 
 export const ChangePassword = z.object({

@@ -9,6 +9,8 @@ import { default as BaseForm, DefaultFormData } from "@/components/form/form";
 import { useUserFields } from "./_fields";
 import { UserInfo } from "@/validation";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import { AlertCircleIcon } from "lucide-react";
 //import z from "zod";
 //import { zodResolver } from "@hookform/resolvers/zod";
 
@@ -20,9 +22,9 @@ import { zodResolver } from "@hookform/resolvers/zod";
 
 //type FormType = Record<string, string | number | number[]>;
 type FormType = {
-  gender: 'man' | 'woman';
+  gender: "man" | "woman";
   dob: Date;
-}
+};
 
 export default function UserPage() {
   const [formData, setFormData] = useState<DefaultFormData>();
@@ -80,7 +82,7 @@ export default function UserPage() {
             return data;
           }}
         >
-          {({ fields }) => (
+          {({ fields, form }) => (
             <div className="flex flex-col gap-4">
               <h3 className="scroll-m-20 text-2xl font-semibold tracking-tight">
                 Základne informácie
@@ -122,6 +124,20 @@ export default function UserPage() {
                 <div className="flex-1">{fields["job"]}</div>
                 <div className="flex-1">{fields["religion"]}</div>
               </div>
+
+              {!form.formState.isValid && form.formState.isSubmitted && <Alert variant="destructive">
+                <AlertCircleIcon />
+                <AlertTitle>Nastala chyba.</AlertTitle>
+                <AlertDescription>                  
+                  <ul className="list-inside list-disc text-sm">
+                    {Object.keys(form.formState.errors).map((key) => (
+                      <li key={key}>
+                        {form.formState.errors[key]?.message?.toString()}
+                      </li>
+                    ))}
+                  </ul>
+                </AlertDescription>
+              </Alert>}
 
               <Button type="submit" className="mt-4">
                 Ulož zmeny

@@ -72,7 +72,7 @@ export default function MediaUploader(props: MediaUploaderProps) {
   }*/
 
   return (
-    <div className="borderxx border-gray p-3">
+    <div className="flex flex-col">
       <div
         className="flex items-center justify-center w-full mb-3"
         //onDrop={handleDrop}
@@ -102,22 +102,21 @@ export default function MediaUploader(props: MediaUploaderProps) {
         </label>
       </div>
       {selectedFiles && selectedFiles.length > 0 && (
-        <div>
-          <div className="flex flex-wrap mb-2 gap-2">
-            {selectedFiles.map((file) => (
-              <div className="relative max-w-[150px]" key={file.name}>
-                <Image
-                  alt="img"
-                  layout="fill"
-                  className="object-cover w-full h-full"
-                  src={URL.createObjectURL(file)}
-                />
-                <div className="bg-white rounded-full w-6 h-6 absolute top-3 right-3 flex items-center justify-center">
-                  <XIcon onClick={() => removeFile(file)} className="size-4" />
-                </div>
+        <div className="flex flex-wrap mb-2 gap-2">
+          {selectedFiles.map((file) => (
+            <div className="relative w-[150px] h-[150px] max-w-[150px]" key={file.name}>
+              {file.name}
+              <Image
+                alt="img"
+                layout="fill"
+                className="object-cover w-full h-full"
+                src={URL.createObjectURL(file)}
+              />
+              <div className="bg-white rounded-full w-6 h-6 absolute top-3 right-3 flex items-center justify-center">
+                <XIcon onClick={() => removeFile(file)} className="size-4" />
               </div>
-            ))}
-          </div>
+            </div>
+          ))}
         </div>
       )}
     </div>

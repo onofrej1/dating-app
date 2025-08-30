@@ -22,10 +22,28 @@
   object-fit: cover;
 }
 
-.lightboximg {
-  height: 85vh !important;
+.lightbox {
+  z-index: 100;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%; /*optional bg color*/
+  background-color: rgba(
+    0,
+    0,
+    0,
+    0.65
+  ); /*the following isn't necessary but will help center everything once we add buttons*/
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.lightbox-img {
+  max-height: 85vh !important;
   max-width: 85vw !important;
-  object-fit: cover;
+  width: 100%;
   border: 9px solid white;
 }
 
@@ -57,20 +75,4 @@
   transform: translateY(-50%);
 }
 
-.lightbox {
-  z-index: 100;
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%; /*optional bg color*/
-  background-color: rgba(
-    0,
-    0,
-    0,
-    0.65
-  ); /*the following isn't necessary but will help center everything once we add buttons*/
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-}
+

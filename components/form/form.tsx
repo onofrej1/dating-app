@@ -3,6 +3,7 @@ import {
   FormState,
   useForm,
   UseFormGetValues,
+  UseFormReturn,
   UseFormSetValue,
   UseFormTrigger,
 } from "react-hook-form";
@@ -57,6 +58,7 @@ export type ActionResult = {
 
 export type FormRenderProps = {
   fields: Record<string, JSX.Element>;
+  form: UseFormReturn;
   formState: FormState<DefaultFormData>;
   getValues: UseFormGetValues<DefaultFormData>;
   setValue: UseFormSetValue<DefaultFormData>;
@@ -386,6 +388,7 @@ export default function Form_<T = DefaultFormData>({
         <form onSubmit={form.handleSubmit(submitForm)}>
           {children({
             fields: fieldsToRender,
+            form: form,
             render: renderField,
             ...form,
           })}
