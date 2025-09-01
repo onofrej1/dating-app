@@ -81,7 +81,7 @@ export async function getMessages(conversationId: number) {
       sender: {
         select: {
           id: true,
-          nickname: true,
+          name: true,
           email: true,
           image: true,
         },
@@ -116,7 +116,7 @@ export async function createMessage(
       type: true,
       sender: {
         select: {
-          nickname: true,
+          name: true,
           email: true,
           image: true,
         },
@@ -164,7 +164,7 @@ export async function getConversations() {
       id: true,
       user: {
         select: {
-          nickname: true,
+          name: true,
           email: true,
         },
       },
@@ -186,7 +186,7 @@ export async function getConversations() {
               type: true,
               sender: {
                 select: {
-                  nickname: true,
+                  name: true,
                   email: true,
                 },
               },

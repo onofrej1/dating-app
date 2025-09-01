@@ -27,7 +27,7 @@ export default function Conversations() {
                     setConversationId(conversation.conversation.id)
                   }
                 >
-                  {conversation.user.nickname} - {conversation.user.email}
+                  {conversation.user.name} - {conversation.user.email}
                 </Button>
                 <div className="pl-4">
                   <small>

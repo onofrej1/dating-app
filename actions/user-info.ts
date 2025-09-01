@@ -5,34 +5,46 @@ import { Region } from "@/generated/prisma";
 import { auth } from "@/lib/auth";
 import { headers } from "next/headers";
 
-export async function getUserInfo() {
+export async function getUserInfo(id?: string) {
+  console.log('id', id);
+
   const header = await headers();
   const session = await auth.api.getSession({
     headers: header,
   });
   if (!session?.user.id) return;
+  const userId = id || session.user.id;
 
+  const user = await prisma.user.findFirstOrThrow({
+    where: {
+      id: userId,
+    }
+  });
   const userLocation = await prisma.userLocation.findFirst({
     where: {
-      userId: session?.user.id,
+      userId,
     },
   });
 
-  const baseUserInfo = {
-    email: session.user.email,
-    emailVerified: session.user.email,
-    nickname: session.user.nickname,
-    bio: session.user.bio,
-    lastLogin: session.user.lastLogin,
-    dob: session.user.dob,
+  const baseUserInfo: Record<string, unknown> = {
+    name: user.name,
+    bio: user.bio,
+    createdAt: user.createdAt,
+    lastLogin: user.lastLogin,
     userLocation: userLocation,
-    gender: session.user.gender,
-    genderSearch: session.user.genderSearch,
+    gender: user.gender,
+    genderSearch: user.genderSearch,
   };
+
+  if (userId === session.user.id) {
+    baseUserInfo.email = user.email;
+    baseUserInfo.emailVerified = user.email;
+    baseUserInfo.dob = user.dob;
+  }
 
   const userInfo = await prisma.userInfo.findMany({
     where: {
-      userId: session?.user.id,
+      userId,
     },
     include: {
       question: true,
@@ -145,6 +157,7 @@ export async function saveUserInfo(
       }
 
       if (Array.isArray(entry)) {
+        console.log("arr", entry);
         for (const choice of entry) {
           await prisma.userInfo.create({
             data: {
@@ -156,7 +169,7 @@ export async function saveUserInfo(
         }
       }
       if (!Array.isArray(entry)) {
-        await prisma.userInfo.create({          
+        await prisma.userInfo.create({
           data: {
             questionId: question.id,
             userId: session?.user.id,
@@ -169,3 +182,20 @@ export async function saveUserInfo(
 
   return { success: true };
 }
+
+export const saveUserLocation = async (
+  userId: string,
+  country: string,
+  region?: string,
+  city?: string
+) => {
+  await prisma.userLocation.create({
+    data: {
+      userId,
+      country,
+      region: (region as Region) || undefined,
+      city: (city as string) || undefined,
+    },
+  });
+  return { success: true };
+};

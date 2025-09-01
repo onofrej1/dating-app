@@ -136,7 +136,7 @@ export default function Form_<T = DefaultFormData>({
 
     return (
       <>
-        {["text", "number", "email", "hidden"].includes(type) && (
+        {["text", "number", "password", "email", "hidden"].includes(type) && (
           <FormField
             control={form.control}
             name={name}

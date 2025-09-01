@@ -1,13 +1,21 @@
 "use client";
 import { getUserInfo } from "@/actions/user-info";
+import { useSession } from "@/lib/auth-client";
 import { useQuery } from "@tanstack/react-query";
+import { useParams } from "next/navigation";
 import React from "react";
 
 export default function ProfilePage() {
+  const { data: session } = useSession();
+  const params = useParams<{ id: string }>();
+  console.log(params);
+
+  const isCurrentUser = session?.user.id === params.id;
+
   const { data } = useQuery({
     refetchOnWindowFocus: false,
-    queryKey: ["getUserInfo"],
-    queryFn: () => getUserInfo(),
+    queryKey: ["getUserInfo", params.id],
+    queryFn: () => getUserInfo(params.id),
   });
   console.log(data);
 
@@ -17,6 +25,7 @@ export default function ProfilePage() {
     "dob",
     "email",
     "name",
+    "createdAt",
     "lastLogin",
     "country",
     "city",
@@ -36,6 +45,12 @@ export default function ProfilePage() {
     }
     if (["dob", "lastLogin"].includes(key)) {
       value = new Date(value as string).toLocaleDateString();
+    }
+    if (["createdAt"].includes(key)) {
+      value = new Date(value as string).toLocaleString("en-us", {
+        month: "short",
+        year: "numeric",
+      });
     } else if (["emailVerified"].includes(key)) {
       value = value ? "ano" : "nie";
     } else if (key === "locality") {
@@ -65,15 +80,19 @@ export default function ProfilePage() {
         </h3>
         <div className="flex gap-3">
           <div className="flex-1">{render("Meno", "name")}</div>
-          <div className="flex-1">{render("Datum narodenia", "dob")}</div>
+          <div className="flex-1">{render("Lokalita", "locality")}</div>
         </div>
 
-        <div className="flex gap-3">
-          <div className="flex-1">{render("Emailova adresa", "email")}</div>
-          <div className="flex-1">
-            {render("Overeny email", "emailVerified")}
+        {isCurrentUser && (
+          <div className="flex gap-3">
+            <div className="flex-1">{render("Datum narodenia", "dob")}</div>
+            <div className="flex-1">{render("Emailova adresa", "email")}</div>
           </div>
-        </div>
+        )}
+
+        {/*<div className="flex-1">
+            {render("Overeny email", "emailVerified")}
+          </div>*/}
 
         <div className="flex gap-3">
           <div className="flex-1">{render("Pohlavie", "gender")}</div>
@@ -81,7 +100,9 @@ export default function ProfilePage() {
         </div>
 
         <div className="flex gap-3">
-          <div className="flex-1">{render("Lokalita", "locality")}</div>
+          <div className="flex-1">
+            {render("Datum registracie", "createdAt")}
+          </div>
           <div className="flex-1">
             {render("Posledne prihlasenie", "lastLogin")}
           </div>

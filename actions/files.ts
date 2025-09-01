@@ -99,7 +99,7 @@ export async function getUserPhotos(userId?: string) {
     include: {
       user: {
         select: {
-          nickname: true,
+          name: true,
         },
       },
     },

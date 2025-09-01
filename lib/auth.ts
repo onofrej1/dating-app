@@ -13,11 +13,10 @@ export const auth = betterAuth({
         defaultValue: "user",
         input: false, // don't allow user to set role
       },
-      nickname: {
+      /*nickname: {
         type: "string",
-        required: false,
-        //defaultValue: "",
-      },
+        required: false,        
+      },*/
       details: {
         type: "string",
         required: false,
@@ -30,7 +29,7 @@ export const auth = betterAuth({
       },
       gender: {
         type: "string",
-        required: false,
+        required: true,
       },
       genderSearch: {
         type: "string",
@@ -38,7 +37,7 @@ export const auth = betterAuth({
       },
       dob: {
         type: "date",
-        required: false,
+        required: true,
       },
       bio: {
         type: "string",

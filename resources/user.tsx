@@ -8,15 +8,14 @@ const user: Resource = {
   resource: "users",
   advancedFilter: true,
   rules: UpdateUser,
-  menuIcon: "",
-  relations: ["interestedInGenders"],
+  menuIcon: "",  
   form: [
-    { name: "nickname", type: "text", label: "Nickname" },
+    { name: "name", type: "text", label: "Name" },
   ],
   list: [
     {
-      name: "nickname",
-      header: "Nickname",
+      name: "name",
+      header: "name",
     },
   ],
 };

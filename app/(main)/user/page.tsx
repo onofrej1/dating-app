@@ -62,13 +62,6 @@ export default function UserPage() {
       const defaultData: Record<string, unknown> = data.userInfo;
       console.log("default data", defaultData);
 
-      if (defaultData.dob) {
-        /*const date = defaultData.dob as Date;
-        defaultData.year = date.getFullYear().toString();
-        defaultData.month = (date.getMonth() + 1).toString();
-        defaultData.day = date.getDate().toString();*/
-      }
-
       setFormData(defaultData as DefaultFormData);
       setInitialized(true);
     }

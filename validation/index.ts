@@ -31,9 +31,14 @@ const numberValue = z.coerce.number();
 
 export const RegisterUser = z.object({
   //firstName: stringValue,
-  name: stringValue,
-  email: emailValue,
-  password: stringValue,
+  name: z.string('Prosim zadajte "Meno"'),
+  email: z.string('Prosim zadajte "Email"'),
+  dob: z.date('Prosim zadajte "Datum narodenia"'),
+  gender: z.string('Prosim vyberte "Pohlavie"'),
+  password: z.string('Prosim zadajte "Heslo"'),
+  country: z.string('Prosim vyberte "Krajinu"'),
+  region: z.string().optional(),
+  city: z.string().optional(),
 });
 
 export const LoginUser = z.object({
@@ -56,7 +61,7 @@ export const CreateQuestionChoice = z.object({
 
 export const UpdateUser = z.object({
   id: z.string().optional(),
-  nickname: stringValue,
+  name: stringValue,
   interestedInGenders: many2many,
 });
 

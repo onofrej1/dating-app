@@ -48,10 +48,9 @@ export async function GET() {
 
   await auth.api.signUpEmail({
     body: {
-      name: faker.person.fullName(),
+      name: faker.person.firstName(),
       email: "admin@example.com",
-      password: process.env.TEST_USER_PASSWORD!,
-      nickname: faker.person.firstName(),
+      password: process.env.TEST_USER_PASSWORD!,      
       popularity: 0,
       gender: "man",
       genderSearch: "woman",
@@ -66,10 +65,9 @@ export async function GET() {
     const genderSearch = gender === "man" ? "woman" : "man";
     await auth.api.signUpEmail({
       body: {
-        name: faker.person.fullName(),
+        name: faker.person.firstName(),
         email: faker.person.lastName().toLocaleLowerCase() + "@example.com",
-        password: process.env.TEST_USER_PASSWORD!,
-        nickname: faker.person.firstName(),
+        password: process.env.TEST_USER_PASSWORD!,        
         popularity: 0,
         gender,
         genderSearch,

@@ -13,7 +13,7 @@ import {
   PopoverTrigger,
 } from "@/components/ui/popover";
 import { ControllerRenderProps } from "react-hook-form";
-import { FormControl, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
+import { FormControl, FormItem, FormLabel, FormMessage, useFormField } from "@/components/ui/form";
 
 interface DatePickerProps {
   label?: string;
@@ -24,6 +24,7 @@ interface DatePickerProps {
 export function DatePicker(props: DatePickerProps) {
   const { label, field, className } = props;
   const value = field.value;
+  const { error } = useFormField();
 
   React.useEffect(() => {
     if (value && typeof value === "string") {
@@ -38,6 +39,7 @@ export function DatePicker(props: DatePickerProps) {
         <Button
           variant={"outline"}
           className={cn(
+            error && "text-destructive border-destructive",
             "justify-start text-left font-normal w-full",
             !value && "text-muted-foreground",
             className
