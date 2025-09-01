@@ -281,8 +281,10 @@ export default function Form_<T = DefaultFormData>({
               <CheckboxGroup_
                 label={label}
                 field={field}
+                onChange={formField.onChange}
                 control={form.control}
                 className={className}
+                elementClassName={formField.elementClassName}
                 options={formField.options!}
               />
             )}

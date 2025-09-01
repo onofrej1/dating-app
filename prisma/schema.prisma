@@ -49,7 +49,7 @@ model UserInfo {
   weight           Int             @default(0)
   value            String?
 
-  @@unique([userId, questionId], name: "questionIdentifier")
+  //@@unique([userId, questionId], name: "questionIdentifier")
 }
 
 model UserPreferences {

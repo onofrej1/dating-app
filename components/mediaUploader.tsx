@@ -113,7 +113,7 @@ export default function MediaUploader(props: MediaUploaderProps) {
                 src={URL.createObjectURL(file)}
               />
               <div className="bg-white rounded-full w-6 h-6 absolute top-3 right-3 flex items-center justify-center">
-                <XIcon onClick={() => removeFile(file)} className="size-4" />
+                <XIcon onClick={() => removeFile(file)} className="size-4 cursor-pointer" />
               </div>
             </div>
           ))}

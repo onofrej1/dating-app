@@ -20,8 +20,7 @@ interface TextareaProps {
 
 export default function Textarea(props: TextareaProps) {
   const { label, rows, placeholder, field, className } = props;
-  const { error } = useFormField();
-  console.log('render textarea');
+  const { error } = useFormField();  
 
   const Element = (
     <TextareaInput

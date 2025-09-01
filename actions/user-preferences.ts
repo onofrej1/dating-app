@@ -102,7 +102,7 @@ export async function saveUserPreferences(
       },
     });
   
-    if (typeof value === "string" && value !== 'empty') {
+    if (typeof value === "string" && value !== 'all') {
       await prisma.userPreferences.create({
         data: {
           questionId: question.id,

@@ -1,10 +1,16 @@
 "use client";
-import { addPhotos, getUserPhotos, uploadFiles } from "@/actions/files";
+import {
+  addPhotos,
+  deleteFile,
+  deletePhotos,
+  getUserPhotos,
+  uploadFiles,
+} from "@/actions/files";
 import MediaUploader from "@/components/mediaUploader";
 import { Button } from "@/components/ui/button";
 import { useQuery } from "@tanstack/react-query";
 import React, { useEffect, useState } from "react";
-import { Home, Search, Upload, XIcon } from "lucide-react";
+import { Upload, XIcon } from "lucide-react";
 import { useSession } from "@/lib/auth-client";
 import { UserPhoto } from "@/generated/prisma";
 import Image from "next/image";
@@ -12,7 +18,6 @@ import "./gallery.css";
 import {
   Credenza,
   CredenzaBody,
-  CredenzaClose,
   CredenzaContent,
   CredenzaDescription,
   CredenzaFooter,
@@ -20,9 +25,19 @@ import {
   CredenzaTitle,
   CredenzaTrigger,
 } from "@/components/ui/credenza";
+import Loader from "@/components/loader";
+import {
+  Card,  
+  CardContent,  
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 
 export default function PhotosPage() {
   const { data } = useSession();
+  const [uploadDialogOpen, setUploadDialogOpen] = useState(false);
+  const [isUploading, setIsUploading] = useState(false);
+
   const { data: images = [], refetch } = useQuery({
     queryKey: ["getFiles"],
     refetchOnWindowFocus: false,
@@ -77,6 +92,7 @@ export default function PhotosPage() {
   };*/
 
   const upload = async () => {
+    setIsUploading(true);
     const uploadData = new FormData();
     for (const file of files) {
       uploadData.append(file.name, file);
@@ -91,13 +107,24 @@ export default function PhotosPage() {
     );
     setFiles([]);
     refetch();
+    setIsUploading(false);
+  };
+
+  const removeFile = async (file: (typeof images)[0]) => {
+    console.log(file);
+    await deleteFile(file.userId + "/" + file.link);
+    await deletePhotos([file.id], file.userId);
+    refetch();
   };
 
   return (
-    <div className="gap-6 mx-auto max-w-7xl">
-      <div className="relative bg-white shadow-sm border border-slate-200 rounded-lg">
-        <div className="p-4">
-          <div className="photos">
+    <Card className="gap-6 mx-auto max-w-7xl">
+      <CardHeader>
+        <CardTitle>Pocet fotiek: {images?.length} / 10</CardTitle>
+      </CardHeader>
+      <CardContent>
+        
+          <div className="photos mb-4">
             {images?.map((file) => (
               <div key={file.id} className={"relative"}>
                 <Image
@@ -107,44 +134,83 @@ export default function PhotosPage() {
                   src={"/uploads/" + file.userId + "/" + file.link}
                   alt={file.link}
                 />
-                <div className="bg-white rounded-full w-6 h-6 absolute top-3 right-3 flex items-center justify-center">
-                  <XIcon onClick={() => console.log(file)} className="size-4" />
+                <div className="bg-white rounded-full w-6 h-6 absolute top-2 right-2 flex items-center justify-center">
+                  <XIcon
+                    onClick={() => removeFile(file)}
+                    className="size-4 cursor-pointer"
+                  />
                 </div>
               </div>
             ))}
           </div>
-          <h3 className="text-center font-bold text-md my-2">
-            Maximalny pocet fotografii: 10, maximalne velkost subory: 10mb
-          </h3>
-          <Credenza>
-            <CredenzaTrigger asChild>
-              <div className="flex justify-center">
-                <Button
-                  className="text-center mt-2"
-                  variant="default"
-                  size="lg"
-                >
-                  <Upload /> Nahrat fotky
-                </Button>
-              </div>
-            </CredenzaTrigger>
-            <CredenzaContent>
-              <CredenzaHeader>
-                <CredenzaTitle>Credenza</CredenzaTitle>
-                <CredenzaDescription>
-                  A responsive modal component for shadcn/ui.
-                </CredenzaDescription>
-              </CredenzaHeader>
-              <CredenzaBody>
-                <MediaUploader onChange={onChange} />
-              </CredenzaBody>
-              <CredenzaFooter>
-                <Button onClick={upload}>
-                  <Upload /> Upload files
-                </Button>
-              </CredenzaFooter>
-            </CredenzaContent>
-          </Credenza>
+
+          <div
+            className="flex p-4 mb-4 text-sm text-blue-800 rounded-lg bg-blue-50 dark:bg-gray-800 dark:text-blue-400"
+            role="alert"
+          >
+            <svg
+              className="shrink-0 inline w-4 h-4 me-3 mt-[2px]"
+              aria-hidden="true"
+              xmlns="http://www.w3.org/2000/svg"
+              fill="currentColor"
+              viewBox="0 0 20 20"
+            >
+              <path d="M10 .5a9.5 9.5 0 1 0 9.5 9.5A9.51 9.51 0 0 0 10 .5ZM9.5 4a1.5 1.5 0 1 1 0 3 1.5 1.5 0 0 1 0-3ZM12 15H8a1 1 0 0 1 0-2h1v-3H8a1 1 0 0 1 0-2h2a1 1 0 0 1 1 1v4h1a1 1 0 0 1 0 2Z" />
+            </svg>
+            <span className="sr-only">Info</span>
+            <div>
+              <span className="font-medium">
+                Pravidla pre nahravanie fotiek:
+              </span>
+              <ul className="mt-1.5 list-disc list-inside">
+                <li>Maximalna velkost: 10mb</li>
+                <li>Nevhodne subory budu zmazane</li>
+                <li>Maximalny pocet suborov: 10</li>
+                <li>
+                  Fotky sa zobrazia po schvaleni administratorom (do 24h od
+                  pridania)
+                </li>
+              </ul>
+
+              <Credenza
+                open={uploadDialogOpen}
+                onOpenChange={setUploadDialogOpen}
+              >
+                <CredenzaTrigger asChild>
+                  <div className="flex justify-center mt-5">
+                    <button
+                      type="button"
+                      className="gap-2 text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center inline-flex items-center me-2"
+                    >
+                      <Upload size={"16"} /> Nahrat fotky
+                    </button>
+                  </div>
+                </CredenzaTrigger>
+                <CredenzaContent>
+                  {isUploading && <Loader />}
+                  <CredenzaHeader>
+                    <CredenzaTitle>Upload</CredenzaTitle>
+                    <CredenzaDescription>
+                      Vyberte subory pre nahranie.
+                    </CredenzaDescription>
+                  </CredenzaHeader>
+                  <CredenzaBody>
+                    <MediaUploader onChange={onChange} />
+                  </CredenzaBody>
+                  <CredenzaFooter>
+                    <Button
+                      onClick={async () => {
+                        await upload();
+                        setUploadDialogOpen(false);
+                      }}
+                    >
+                      <Upload /> Nahrat fotky
+                    </Button>
+                  </CredenzaFooter>
+                </CredenzaContent>
+              </Credenza>
+            </div>
+          </div>
 
           {lightboxDisplay && imageToShow && (
             <div className="lightbox" onClick={hideLightBox}>
@@ -160,8 +226,8 @@ export default function PhotosPage() {
               </picture>
             </div>
           )}
-        </div>
-      </div>
-    </div>
+        
+      </CardContent>
+    </Card>
   );
 }

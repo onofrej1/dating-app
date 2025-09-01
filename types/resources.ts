@@ -84,7 +84,9 @@ export interface RadioGroup extends BaseFormType {
 
 export interface CheckboxGroup extends BaseFormType {
   type: "checkbox-group";
+  elementClassName?: string;
   options?: SelectOption[] | MultiSelectOption[];
+  onChange?: (value: string[]) => void;
 }
 
 export interface ForeignKeyType extends BaseFormType {

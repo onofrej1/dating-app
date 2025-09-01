@@ -54,7 +54,7 @@ export async function getUsers(filters: Filter[] = []) {
     });
     userIds = userLocations.map((userLocation) => userLocation.userId);
   }
-
+  //console.log(userIds);
   //console.log("get users with filters:", filters, userIds);
 
   const customFilters = ["age-min", "age-max", "country", "region", "city"];
@@ -62,6 +62,10 @@ export async function getUsers(filters: Filter[] = []) {
 
   for (const filter of checkFilters) {
     console.log("search", filter);
+    if (filter.value === 'all') {
+      continue;
+    }
+
     const inValue = Array.isArray(filter.value)
       ? filter.value
       : filter.value
@@ -87,8 +91,9 @@ export async function getUsers(filters: Filter[] = []) {
     }
     userIds = data.map((d) => d.userId);
   }
-
-  if (filters.length > 0 && userIds.length === 0) {
+  //console.log(filters.filter(f => f.value !== 'all'));
+  if (filters/*.filter(f => f.value !== 'all')*/.length > 0 && userIds.length === 0) {
+    //console.log(userIds);
     return [];
   }
 

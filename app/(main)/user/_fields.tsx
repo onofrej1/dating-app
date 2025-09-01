@@ -1,6 +1,6 @@
 import { Question, QuestionChoice } from "@/generated/prisma";
 import { getCityOptions, regionOptions } from "@/lib/countries";
-import { FormField } from "@/types/resources";
+import { CheckboxGroup, FormField } from "@/types/resources";
 
 const getOptions = (choices: QuestionChoice[]) => {
   const options = choices.map((d) => ({
@@ -90,13 +90,17 @@ export const useUserFields = (props?: GetUserFieldsProps) => {
       //'multiple-select': 'multiple-select',
       "checkbox-group": "checkbox-group",
     } as const;
-    fields.push({
+    const field = {
       name: question.name,
       type: type[question.type as keyof typeof type],
       label: question.title,
       //placeholder: 'Nechcem uviesť',
       options: getOptions(question.questionChoices),
-    });
+    };
+    if (field.type === 'checkbox-group') {
+      (field as CheckboxGroup).elementClassName = 'grid grid-cols-3';
+    }
+    fields.push(field);
   });
   return { fields };
 };

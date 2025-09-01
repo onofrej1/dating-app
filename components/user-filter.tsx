@@ -75,6 +75,7 @@ export default function UserFilter({
   );
 
   React.useEffect(() => {
+    console.log(data);
     if (data && !initialized) {
       setFormData({
         age: [
@@ -82,9 +83,16 @@ export default function UserFilter({
           Number(data.defaultData["age-max"]) || 80,
         ],
         ...data.defaultData,
+        hobby: (data.defaultData['hobby'] as any[])?.map(option => option.value) || [],
       });
 
-      const newFields = data.filterOptions.map((filter) => {
+      const filterFields = (filter: { name: string }) => {
+        return !['age-min', 'age-max', 'hobby'].includes(filter.name);
+      }
+      
+      const newFields = data.filterOptions.filter(filterFields).map((filter) => {
+        console.log(filter.name);
+        
         const options = filter.options;
         if (filter.type === "select") {
           options.unshift({ value: "all", label: "Všetky" });
@@ -106,6 +114,21 @@ export default function UserFilter({
         } as FormField;
       });
 
+      const hobbyOptions = data.filterOptions.find(o => o.name === 'hobby');
+      const hobby: FormField = {
+        label: "Hobby",
+        name: "hobby",
+        type: "checkbox-group",
+        elementClassName: 'grid grid-cols-3',
+        onChange: (value) => {
+          console.log(value);
+          const saveValue = value.map(v => Number(v));
+          updateFilter('hobby', saveValue);
+          saveUserPreferences('hobby', saveValue);
+        },
+        options: hobbyOptions?.options || [],
+      };
+
       const age: FormField = {
         label: "Vek",
         name: "age",
@@ -115,6 +138,8 @@ export default function UserFilter({
         onChange: (value: number[]) => {
           updateFilter("age-min", value[0].toString());
           updateFilter("age-max", value[1].toString());
+          saveUserPreferences('age-min', value[0].toString());
+          saveUserPreferences('age-max', value[1].toString());
         },
       };
 
@@ -158,7 +183,8 @@ export default function UserFilter({
                 updateFilter("city", null);
                 saveLocation({ region, city: null });
               }
-              if (region === "all") {
+              console.log(region);
+              if (region === "all" || region === undefined) {
                 return [];
               }
               const cityOptions = getCityOptions(region);
@@ -180,7 +206,8 @@ export default function UserFilter({
           },
         ] as FormField[],
       };
-      setFields([age, country, ...newFields]);
+      setFields([age, country, hobby, ...newFields]);
+      console.log('current', data.userPreferences);
       filters.current = data.userPreferences;
 
       onFilterChange?.();
@@ -189,6 +216,7 @@ export default function UserFilter({
   }, [data, filters, initialized, onFilterChange, updateFilter]);
 
   if (!initialized) return <div>Loading...</div>;
+  console.log(formData);
 
   return (
     <Card>
@@ -235,6 +263,7 @@ export default function UserFilter({
                         <div className="flex-1">{fields["job"]}</div>
                         <div className="flex-1">{fields["religion"]}</div>
                       </div>
+                      {fields['hobby']}
                     </CollapsibleContent>
                   </Collapsible>
                 </div>

@@ -14,9 +14,11 @@ import { Checkbox } from "@/components/ui/checkbox";
 interface CheckboxGroupProps {
   label?: string;
   className?: string;
+  elementClassName?: string;
   options: SelectOption[];
   field: ControllerRenderProps;
   control: Control;
+  onChange?: (value: string[]) => void;
 }
 
 export default function CheckboxGroup_({
@@ -24,10 +26,11 @@ export default function CheckboxGroup_({
   options,
   field,
   control,
+  onChange,
+  elementClassName,
 }: CheckboxGroupProps) {
-
   const Element = (
-    <div>
+    <div className={elementClassName}>
       {options &&
         options?.map((option) => (
           <FormField
@@ -46,22 +49,16 @@ export default function CheckboxGroup_({
                     <Checkbox
                       checked={value?.includes(option.value)}
                       onCheckedChange={(checked) => {
-                        return checked
-                          ? field.onChange([
-                              ...(value || []),
-                              option.value,
-                            ])
-                          : field.onChange(
-                              value.filter(
-                                (value) => value !== option.value
-                              )
-                            );
+                        const newValue = checked
+                          ? [...(value || []), option.value]
+                          : value.filter((value) => value !== option.value);
+                        field.onChange(newValue);
+                        onChange?.(newValue);
+                        return newValue;
                       }}
                     />
                   </FormControl>
-                  <FormLabel>
-                    {option.label}
-                  </FormLabel>
+                  <FormLabel>{option.label}</FormLabel>
                 </FormItem>
               );
             }}

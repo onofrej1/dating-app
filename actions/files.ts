@@ -2,7 +2,7 @@
 
 import path from "node:path";
 
-import fs from 'node:fs';
+import fs from "node:fs";
 import { prisma } from "@/db/prisma";
 const fsp = fs.promises;
 
@@ -10,7 +10,7 @@ const baseUploadDir = process.env.UPLOAD_DIR!;
 
 export async function addPhotos(photos: string[], userId?: string) {
   if (!userId) {
-    throw new Error('Missing user id');
+    throw new Error("Missing user id");
   }
 
   for (const photo of photos) {
@@ -19,13 +19,31 @@ export async function addPhotos(photos: string[], userId?: string) {
         userId,
         link: photo,
         addedAt: new Date(),
-        details: '',
-      }
-    })
-  }  
+        details: "",
+      },
+    });
+  }
 }
 
-export async function uploadFiles(formData: FormData, uploadDir: string | Record<string, string> = '') {
+export async function deletePhotos(photos: number[], userId?: string) {
+  if (!userId) {
+    throw new Error("Missing user id");
+  }
+
+  await prisma.userPhoto.deleteMany({
+    where: {
+      userId,
+      id: {
+        in: photos,
+      },
+    },
+  });
+}
+
+export async function uploadFiles(
+  formData: FormData,
+  uploadDir: string | Record<string, string> = ""
+) {
   const keys = Array.from(formData.keys());
 
   for (let i = 0; i < Number(keys.length); i++) {
@@ -35,13 +53,14 @@ export async function uploadFiles(formData: FormData, uploadDir: string | Record
       throw new Error("Missing file data:" + keys[i]);
     }*/
 
-    const dir = typeof uploadDir === 'string' ? uploadDir : uploadDir?.[keys[i]];
+    const dir =
+      typeof uploadDir === "string" ? uploadDir : uploadDir?.[keys[i]];
     const targetPath = path.join(process.cwd(), baseUploadDir, dir);
 
     try {
       fs.mkdirSync(targetPath, { recursive: true });
       const filePath = path.join(targetPath, file.name);
-      console.log('f', file);
+      console.log("f", file);
 
       const arrayBuffer = await file.arrayBuffer();
       const buffer = Buffer.from(arrayBuffer);
@@ -49,7 +68,7 @@ export async function uploadFiles(formData: FormData, uploadDir: string | Record
       fs.writeFileSync(filePath, buffer);
     } catch (error) {
       console.log(error);
-      return { status: 'error' };
+      return { status: "error" };
     }
   }
   return { status: "success" };
@@ -58,7 +77,7 @@ export async function uploadFiles(formData: FormData, uploadDir: string | Record
 export async function deleteFile(filePath: string) {
   const file = path.join(process.cwd(), baseUploadDir, filePath);
   if (!fs.existsSync(file)) {
-    return { success: false, message: `File ${file} does not exists.`};
+    return { success: false, message: `File ${file} does not exists.` };
   }
   const fileToDelete = await fsp.readFile(file);
   if (fileToDelete) {
@@ -69,18 +88,18 @@ export async function deleteFile(filePath: string) {
 
 export async function getUserPhotos(userId?: string) {
   console.log(userId);
-  if (!userId) { 
+  if (!userId) {
     return [];
   }
 
   const data = await prisma.userPhoto.findMany({
     where: {
-        userId,
+      userId,
     },
     include: {
       user: {
         select: {
-          nickname: true,          
+          nickname: true,
         },
       },
     },
@@ -91,7 +110,7 @@ export async function getUserPhotos(userId?: string) {
 
 export async function readDirectory(dir: string) {
   const dirPath = path.join(process.cwd(), dir);
-  const files = await fsp.readdir(dirPath, { withFileTypes: true });  
+  const files = await fsp.readdir(dirPath, { withFileTypes: true });
   const data = [];
   for (const file of files) {
     const filePath = path.join(file.path, file.name);

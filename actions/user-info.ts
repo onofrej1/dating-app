@@ -75,112 +75,97 @@ export async function getUserInfo() {
 }
 
 export async function saveUserInfo(
-    data: Record<string, string | Date | number | number[]>
-  ) {
-    const header = await headers();
-    const session = await auth.api.getSession({
-      headers: header,
-    });
-  
-    if (!session?.user.id) return;
-  
-    const questions = await prisma.question.findMany();
-    /*await prisma.userInfo.deleteMany({
+  data: Record<string, string | Date | number | number[]>
+) {
+  const header = await headers();
+  const session = await auth.api.getSession({
+    headers: header,
+  });
+
+  if (!session?.user.id) return;
+
+  const questions = await prisma.question.findMany();
+  /*await prisma.userInfo.deleteMany({
       where: {
         userId: session.user.id,
       },
     });*/
-  
-    await prisma.user.update({
-      where: {
-        id: session.user.id,
+
+  await prisma.user.update({
+    where: {
+      id: session.user.id,
+    },
+    data: {
+      bio: data.bio as string,
+      gender: data.gender as string,
+      genderSearch: data.genderSearch as string,
+      dob: data.dob as Date,
+    },
+  });
+
+  if (data.country) {
+    await prisma.userLocation.upsert({
+      create: {
+        userId: session.user.id,
+        country: (data.country as string) || undefined,
+        region: (data.region as Region) || undefined,
+        city: (data.city as string) || undefined,
       },
-      data: {
-        bio: data.bio as string,
-        gender: data.gender as string,
-        genderSearch: data.genderSearch as string,
-        dob: data.dob as Date,
+      update: {
+        country: (data.country as string) || undefined,
+        region: (data.region as Region) || undefined,
+        city: (data.city as string) || undefined,
+      },
+      where: {
+        userId: session.user.id,
       },
     });
-  
-    if (data.country) {
-      await prisma.userLocation.upsert({
-        create: {
-          userId: session.user.id,
-          country: (data.country as string) || undefined,
-          region: (data.region as Region) || undefined,
-          city: (data.city as string) || undefined,
-        },
-        update: {
-          country: (data.country as string) || undefined,
-          region: (data.region as Region) || undefined,
-          city: (data.city as string) || undefined,
-        },
+  }
+
+  for (const question of questions) {
+    if (data[question.name]) {
+      const entry = data[question.name];
+      console.log("entry", question.id, entry);
+
+      await prisma.userInfo.deleteMany({
         where: {
           userId: session.user.id,
+          questionId: question.id,
         },
       });
-    }
-  
-    for (const question of questions) {
-      if (data[question.name]) {
-        const entry = data[question.name];
-        console.log("entry", question.id, entry);
-        if (!entry || entry === 'all') {
-          await prisma.userInfo.deleteMany({
-            where: {
-              userId: session.user.id,
-              questionId: question.id,
-            },
-          });
-          continue;
-        }
 
-        if (Array.isArray(entry) && entry.length > 0) {
-          for (const choice of entry) {
-            await prisma.userInfo.upsert({
-              where: {
-                questionIdentifier: {
-                  questionId: question.id!,
-                  userId: session?.user.id,
-                },
-              },
-              create: {
-                questionId: question.id,
-                userId: session?.user.id,
-                questionChoiceId: Number(choice),
-              },
-              update: {
-                questionId: question.id!,
-                userId: session?.user.id,
-                questionChoiceId: Number(choice),
-              },
-            });
-          }
-        }
-        if (!Array.isArray(entry)) {
-          await prisma.userInfo.upsert({
-            where: {
-              questionIdentifier: {
-                questionId: question.id!,
-                userId: session?.user.id,
-              },
-            },
-            create: {
+      if (!entry || entry === "all") {
+        /*await prisma.userInfo.deleteMany({
+          where: {
+            userId: session.user.id,
+            questionId: question.id,
+          },
+        });*/
+        continue;
+      }
+
+      if (Array.isArray(entry)) {
+        for (const choice of entry) {
+          await prisma.userInfo.create({
+            data: {
               questionId: question.id,
               userId: session?.user.id,
-              questionChoiceId: Number(entry),
-            },
-            update: {
-              questionId: question.id!,
-              userId: session?.user.id,
-              questionChoiceId: Number(entry),
+              questionChoiceId: Number(choice),
             },
           });
         }
       }
+      if (!Array.isArray(entry)) {
+        await prisma.userInfo.create({          
+          data: {
+            questionId: question.id,
+            userId: session?.user.id,
+            questionChoiceId: Number(entry),
+          },
+        });
+      }
     }
-  
-    return { success: true };
   }
-  
+
+  return { success: true };
+}

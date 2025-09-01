@@ -49,7 +49,7 @@ export const CreateQuestion = z.object({
 
 export const CreateQuestionChoice = z.object({
   id: idValue,
-  title: stringValue, 
+  title: stringValue,
   displayOrder: numberValue,
   questionId: z.coerce.number(),
 });
@@ -74,11 +74,25 @@ export const ResetPassword = z.object({
   password: emailValue,
 });
 
+const optionalString = z.string().optional();
+
 export const UserInfo = z.object({
   gender: z.string('Pole "pohlavie" je povinne'), //., "Please enter a valid value")
   dob: z.date('Pole "datum narodenia" je povinne'),
   country: z.string('Pole "krajina" je povinne'),
-  //region: z.string('Pole je povinne')
+  region: optionalString,
+  city: optionalString,
+  figure: optionalString,
+  hair: optionalString,
+  smoking: optionalString,
+  drinking: optionalString,
+  education: optionalString,
+  religion: optionalString,
+  job: optionalString,
+  hobby: z.array(z.string()).optional().default([]),
+  ["marital-status"]: optionalString,
+  ["age-min"]: optionalString,
+  ["age-max"]: optionalString,
 });
 
 export const ChangePassword = z.object({
@@ -91,7 +105,7 @@ export type Rules =
   | typeof RegisterUser
   | typeof LoginUser
   | typeof UpdateUser
-  | typeof ChangePassword  
+  | typeof ChangePassword
   | typeof ResetPasswordRequest
   | typeof ContactForm
   | typeof ResetPassword
