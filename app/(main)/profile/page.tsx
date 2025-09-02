@@ -46,8 +46,8 @@ export default function ProfilePage() {
       if (data?.userInfo.city) {
         value += " (" + data.userInfo.city + ")";
       }
-    } else if (key === 'gender') {
-      value = value === 'man' ? 'Muž' : 'Žena';
+    } else if (key === "gender") {
+      value = value === "man" ? "Muž" : "Žena";
     }
 
     return (
@@ -65,14 +65,18 @@ export default function ProfilePage() {
   return (
     <div className="relative flex flex-col p-6 bg-white shadow-sm border border-slate-200 rounded-lg">
       <div className="flex flex-col gap-4">
-        <div className="flex gap-4">
+        <div className="flex gap-4 mb-4">
           <h3 className="scroll-m-20 text-2xl font-semibold tracking-tight">
             Základne informácie
           </h3>
-          <Link href='/user'>
-            <Button size='sm'><Pencil /> Upravit</Button>
+          <Link href="/user">
+            <Button size="sm">
+              <Pencil /> Upravit
+            </Button>
           </Link>
         </div>
+
+        
         <div className="flex gap-3">
           <div className="flex-1">{render("Meno", "name")}</div>
           <div className="flex-1">{render("Datum narodenia", "dob")}</div>

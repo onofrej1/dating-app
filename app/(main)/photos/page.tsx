@@ -27,6 +27,7 @@ import {
 } from "@/components/ui/credenza";
 import Loader from "@/components/loader";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Small } from "@/components/typography";
 
 export default function PhotosPage() {
   const { data } = useSession();
@@ -125,7 +126,7 @@ export default function PhotosPage() {
         </CardHeader>
       )}
       <CardContent>
-        <div className="gallery mb-4">
+        <div className="gallery mb-6">
           {images?.map((file) => (
             <div key={file.id} className={"relative"}>
               <Image
@@ -135,6 +136,7 @@ export default function PhotosPage() {
                 src={"/uploads/" + file.userId + "/" + file.link}
                 alt={file.link}
               />
+              <Small className="abc">[Set as default]</Small>
               <div className="bg-white rounded-full w-6 h-6 absolute top-2 right-2 flex items-center justify-center">
                 <XIcon
                   onClick={() => removeFile(file)}

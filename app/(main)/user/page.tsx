@@ -16,12 +16,11 @@ import {
   Credenza,
   CredenzaBody,
   CredenzaContent,
-  CredenzaDescription,
   CredenzaFooter,
-  CredenzaHeader,
-  CredenzaTitle,
 } from "@/components/ui/credenza";
 import { Badge } from "@/components/ui/badge";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Trash, Upload } from "lucide-react";
 
 //import z from "zod";
 //import { zodResolver } from "@hookform/resolvers/zod";
@@ -95,6 +94,22 @@ export default function UserPage() {
                 <div className="flex-1">{fields.gender}</div>
                 <div className="flex-1">{fields.dob}</div>
               </div>
+              <div>
+                Nastavit titulnu fotku
+              </div>
+              <div className="flex items-center border-gray-400 border border-dashed p-3">
+                <Avatar className="mr-2 w-[100px] h-[100px]">
+                  <AvatarImage src="https://github.com/shadcn.png" />
+                  <AvatarFallback>CN</AvatarFallback>
+                </Avatar>
+                <Button className="mr-1">
+                  <Upload /> Nahrat fotku
+                </Button>
+                <Button variant={"outline"}>
+                  <Trash /> Zmazat
+                </Button>
+              </div>
+              
 
               <div className="border border-gray-400 border-dashed p-4">
                 {fields["country-cascader"]}
@@ -128,7 +143,12 @@ export default function UserPage() {
               <div className="flex gap-3 align-center">
                 <H3>Zaluby / hobby</H3>
                 <div className="flex">
-                  <Button onClick={() => setHobbyDialogOpen(true)} type="button" size="sm" variant={"outline"}>
+                  <Button
+                    onClick={() => setHobbyDialogOpen(true)}
+                    type="button"
+                    size="sm"
+                    variant={"outline"}
+                  >
                     <Pencil /> Upravit
                   </Button>
                 </div>
@@ -148,7 +168,7 @@ export default function UserPage() {
               <Credenza
                 open={hobbyDialogOpen}
                 onOpenChange={setHobbyDialogOpen}
-              >                
+              >
                 <CredenzaContent>
                   {/*<CredenzaHeader>
                     <CredenzaTitle>Zaujmy</CredenzaTitle>
