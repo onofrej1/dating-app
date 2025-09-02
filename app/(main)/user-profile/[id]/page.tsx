@@ -3,12 +3,32 @@ import { getUserInfo } from "@/actions/user-info";
 import { useSession } from "@/lib/auth-client";
 import { useQuery } from "@tanstack/react-query";
 import { useParams } from "next/navigation";
-import React from "react";
+import React, { useEffect, useState } from "react";
+import Image from "next/image";
+import { getUserPhotos } from "@/actions/files";
+import "./page.css";
+import { H3, H4, Small } from "@/components/typography";
+import { Calendar, CalendarIcon, Image as LucideImage, MapPin, Mars, User, Venus } from "lucide-react";
 
 export default function ProfilePage() {
   const { data: session } = useSession();
   const params = useParams<{ id: string }>();
-  console.log(params);
+
+  const { data: images = [], refetch } = useQuery({
+    queryKey: ["getFiles"],
+    refetchOnWindowFocus: false,
+    queryFn: () => getUserPhotos(params.id), //readDirectory("/public/gallery"),
+  });
+
+  const [selectedImage, setSelectedImage] = useState<(typeof images)[0]>();
+
+  console.log(images);
+
+  useEffect(() => {
+    if (images.length > 0) {
+      setSelectedImage(images[0]);
+    }
+  }, [images]);
 
   const isCurrentUser = session?.user.id === params.id;
 
@@ -73,43 +93,92 @@ export default function ProfilePage() {
   };
 
   return (
-    <div className="relative flex flex-col p-6 bg-white shadow-sm border border-slate-200 rounded-lg">
-      <div className="flex flex-col gap-4">
-        <h3 className="scroll-m-20 text-2xl font-semibold tracking-tight">
-          Základne informácie
-        </h3>
-        <div className="flex gap-3">
-          <div className="flex-1">{render("Meno", "name")}</div>
-          <div className="flex-1">{render("Lokalita", "locality")}</div>
+    <div className="relative p-6 bg-white shadow-sm border border-slate-200 rounded-lg">
+      <div className="flex gap-8">
+        <div className="relative w-[200px] h-[200px]">
+          {selectedImage && (
+            <Image
+              layout="fill"
+              className="rounded-full border-1 border-gray-500 bg-white p-1 object-cover w-full h-full"
+              src={
+                "/uploads/" + selectedImage.userId + "/" + selectedImage.link
+              }
+              alt="@shadcn"
+            />
+          )}
         </div>
-
-        {isCurrentUser && (
-          <div className="flex gap-3">
-            <div className="flex-1">{render("Datum narodenia", "dob")}</div>
-            <div className="flex-1">{render("Emailova adresa", "email")}</div>
+        <div className="flex-1 space-y-3">
+          <div className="flex gap-3 items-center mb-3">
+            <H3>{data?.userInfo["name"]}</H3>{" "}
+            {data?.userInfo.gender === "man" ? <Mars /> : <Venus />}{" "}
           </div>
-        )}
+          <div className="flex">
+            <div className="flex-1 space-y-2">
+              <div className="flex gap-3 items-start">
+                <MapPin className="mt-1" />
+                <div>
+                  <H4>Lokalita</H4>
+                  <div>Slovensko</div>
+                </div>
+              </div>
 
-        {/*<div className="flex-1">
-            {render("Overeny email", "emailVerified")}
-          </div>*/}
+              <div className="flex gap-3 items-start">
+                <Calendar className="mt-1" />
+                <div>
+                  <H4>Vek</H4>
+                  <div>25r</div>
+                </div>
+              </div>
+            </div>
 
-        <div className="flex gap-3">
-          <div className="flex-1">{render("Pohlavie", "gender")}</div>
-          <div className="flex-1">{render("Hladam", "genderSearch")}</div>
+            <div className="flex-1 space-y-2">
+              <div className="flex gap-3 items-start">
+                <User className="mt-1" />
+                <div>
+                  <H4>Hlada</H4>
+                  <div>{data?.userInfo.genderSearch || "Neuvedene"}</div>
+                </div>
+              </div>
+
+              <div className="flex gap-3 items-start">
+                <CalendarIcon className="mt-1" />
+                <div>
+                  <H4>Naposledy prihlaseny</H4>
+                  <div>{data?.userInfo.createdAt?.toLocaleDateString()}</div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <H4 className="flex gap-3 items-baseline">Nahrane fotky <Small>Kliknutim na obrazok
+            zobrazite fotky v plnej velkosti</Small></H4>
+
+          {selectedImage && (
+            <div className="flex mt-4 gap-3 border-2 border-gray-300 p-2">
+              {images?.slice(2).map((file) => (
+                <div
+                  key={file.id}
+                  className="rounded-md relative w-[70px] h-[70px]"
+                >
+                  <Image
+                    layout={"fill"}
+                    className=" object-cover w-full h-full cursor-pointer"
+                    onClick={() => setSelectedImage(file)}
+                    //src={URL.createObjectURL(file)}
+                    //className="h-auto max-w-full rounded-lg"
+                    src={"/uploads/" + file.userId + "/" + file.link}
+                    alt=""
+                  />
+                </div>
+              ))}
+            </div>
+          )}
         </div>
+      </div>
+      <div className="mt-4 flex flex-col gap-4">
 
-        <div className="flex gap-3">
-          <div className="flex-1">
-            {render("Datum registracie", "createdAt")}
-          </div>
-          <div className="flex-1">
-            {render("Posledne prihlasenie", "lastLogin")}
-          </div>
-        </div>
-
-        <h3 className="scroll-m-20 text-2xl font-semibold tracking-tight">
-          Doplňujúce informácie
+        <h3 className="mt-4 scroll-m-20 text-2xl font-semibold tracking-tight">
+          Blizsie informácie
         </h3>
         <div className="flex gap-3">
           <div className="flex-1">{render("Vyska", "height")}</div>

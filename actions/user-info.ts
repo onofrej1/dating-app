@@ -26,7 +26,7 @@ export async function getUserInfo(id?: string) {
     },
   });
 
-  const baseUserInfo: Record<string, unknown> = {
+  const baseUserInfo = {
     name: user.name,
     bio: user.bio,
     createdAt: user.createdAt,
@@ -37,9 +37,9 @@ export async function getUserInfo(id?: string) {
   };
 
   if (userId === session.user.id) {
-    baseUserInfo.email = user.email;
+    /*baseUserInfo.email = user.email;
     baseUserInfo.emailVerified = user.email;
-    baseUserInfo.dob = user.dob;
+    baseUserInfo.dob = user.dob;*/
   }
 
   const userInfo = await prisma.userInfo.findMany({
@@ -96,12 +96,7 @@ export async function saveUserInfo(
 
   if (!session?.user.id) return;
 
-  const questions = await prisma.question.findMany();
-  /*await prisma.userInfo.deleteMany({
-      where: {
-        userId: session.user.id,
-      },
-    });*/
+  const questions = await prisma.question.findMany();  
 
   await prisma.user.update({
     where: {
@@ -147,17 +142,10 @@ export async function saveUserInfo(
       });
 
       if (!entry || entry === "all") {
-        /*await prisma.userInfo.deleteMany({
-          where: {
-            userId: session.user.id,
-            questionId: question.id,
-          },
-        });*/
         continue;
       }
 
       if (Array.isArray(entry)) {
-        console.log("arr", entry);
         for (const choice of entry) {
           await prisma.userInfo.create({
             data: {
