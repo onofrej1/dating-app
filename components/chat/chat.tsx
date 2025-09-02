@@ -103,12 +103,11 @@ export default function Chat(props: ChatProps) {
                     </span>
                   </div>
                   <p className="text-sm font-normal py-2.5 text-gray-900 dark:text-white">
-                    {message.content} I think our users will really appreciate
-                    the improvements.
+                    {message.content}
                   </p>
-                  <span className="text-sm font-normal text-gray-500 dark:text-gray-400">
+                  {/*<span className="text-sm font-normal text-gray-500 dark:text-gray-400">
                     Delivered
-                  </span>
+                  </span>*/}
                 </div>
               </div>
             </div>

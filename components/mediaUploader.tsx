@@ -105,7 +105,6 @@ export default function MediaUploader(props: MediaUploaderProps) {
         <div className="flex flex-wrap mb-2 gap-2">
           {selectedFiles.map((file) => (
             <div className="relative w-[150px] h-[150px] max-w-[150px]" key={file.name}>
-              {file.name}
               <Image
                 alt="img"
                 layout="fill"

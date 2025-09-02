@@ -32,7 +32,8 @@ export async function startConversation(userId: string) {
     },
   });
   if (user2conversation) {
-    throw new Error('Conversation already exists.');
+    return { success: true, message: 'Conversation already exists.' };
+    //throw new Error('Conversation already exists.');
   }
 
   const conversation = await prisma.conversation.create({

@@ -10,7 +10,7 @@ import MediaUploader from "@/components/mediaUploader";
 import { Button } from "@/components/ui/button";
 import { useQuery } from "@tanstack/react-query";
 import React, { useEffect, useState } from "react";
-import { Upload, XIcon } from "lucide-react";
+import { ChevronLeft, ChevronRight, Info, Upload, XIcon } from "lucide-react";
 import { useSession } from "@/lib/auth-client";
 import { UserPhoto } from "@/generated/prisma";
 import Image from "next/image";
@@ -26,12 +26,7 @@ import {
   CredenzaTrigger,
 } from "@/components/ui/credenza";
 import Loader from "@/components/loader";
-import {
-  Card,  
-  CardContent,  
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
 export default function PhotosPage() {
   const { data } = useSession();
@@ -39,13 +34,12 @@ export default function PhotosPage() {
   const [isUploading, setIsUploading] = useState(false);
 
   const { data: images = [], refetch } = useQuery({
-    queryKey: ["getFiles"],
+    queryKey: ["getImages", data?.user.id],
     refetchOnWindowFocus: false,
-    queryFn: () => getUserPhotos(data?.user.id), //readDirectory("/public/gallery"),
+    queryFn: () => getUserPhotos(data?.user.id),
   });
 
   useEffect(() => {
-    console.log("refetch");
     refetch();
   }, [data?.user.id, refetch]);
 
@@ -53,6 +47,10 @@ export default function PhotosPage() {
 
   const [files, setFiles] = useState<File[]>([]);
   const onChange = (selectedFiles: File[]) => {
+    if (images.length + selectedFiles.length > 10) {
+      alert('Prekroceny maximalny pocet fotiek.');
+      return;
+    }
     setFiles(selectedFiles);
   };
 
@@ -60,8 +58,7 @@ export default function PhotosPage() {
   const [imageToShow, setImageToShow] = useState<UserPhoto>();
 
   const showImage = (image: UserPhoto) => {
-    //set imageToShow to be the one that's been clicked on
-    setImageToShow(image); //set lightbox visibility to true
+    setImageToShow(image);
     setLightBoxDisplay(true);
   };
 
@@ -69,29 +66,33 @@ export default function PhotosPage() {
     setLightBoxDisplay(false);
   };
 
-  /*const showNext = (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
+  const showNext = (e: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
     e.stopPropagation();
     const currentIndex = images.findIndex((e) => e.id === imageToShow?.id);
     if (currentIndex >= images.length - 1) {
-      setLightBoxDisplay(false);
+      setImageToShow(images[0]);
     } else {
       const nextImage = images[currentIndex + 1];
       setImageToShow(nextImage);
     }
   };
 
-  const showPrev = (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
+  const showPrev = (e: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
     e.stopPropagation();
     const currentIndex = images.findIndex((e) => e.id === imageToShow?.id);
     if (currentIndex <= 0) {
-      setLightBoxDisplay(false);
+      setImageToShow(images[images.length - 1]);
     } else {
       const nextImage = images[currentIndex - 1];
       setImageToShow(nextImage);
     }
-  };*/
+  };
 
   const upload = async () => {
+    if (images.length + files.length > 10) {
+      alert('Prekroceny maximalny pocet fotiek.');
+      return;
+    }
     setIsUploading(true);
     const uploadData = new FormData();
     for (const file of files) {
@@ -111,7 +112,6 @@ export default function PhotosPage() {
   };
 
   const removeFile = async (file: (typeof images)[0]) => {
-    console.log(file);
     await deleteFile(file.userId + "/" + file.link);
     await deletePhotos([file.id], file.userId);
     refetch();
@@ -119,114 +119,106 @@ export default function PhotosPage() {
 
   return (
     <Card className="gap-6 mx-auto max-w-7xl">
-      <CardHeader>
-        <CardTitle>Pocet fotiek: {images?.length} / 10</CardTitle>
-      </CardHeader>
+      {images.length > 0 && (
+        <CardHeader>
+          <CardTitle>Pocet fotiek: {images?.length} / 10</CardTitle>
+        </CardHeader>
+      )}
       <CardContent>
-        
-          <div className="photos mb-4">
-            {images?.map((file) => (
-              <div key={file.id} className={"relative"}>
-                <Image
-                  layout="fill"
-                  key={file.id}
-                  onClick={() => showImage(file)}
-                  src={"/uploads/" + file.userId + "/" + file.link}
-                  alt={file.link}
+        <div className="gallery mb-4">
+          {images?.map((file) => (
+            <div key={file.id} className={"relative"}>
+              <Image
+                layout="fill"
+                key={file.id}
+                onClick={() => showImage(file)}
+                src={"/uploads/" + file.userId + "/" + file.link}
+                alt={file.link}
+              />
+              <div className="bg-white rounded-full w-6 h-6 absolute top-2 right-2 flex items-center justify-center">
+                <XIcon
+                  onClick={() => removeFile(file)}
+                  className="size-4 cursor-pointer"
                 />
-                <div className="bg-white rounded-full w-6 h-6 absolute top-2 right-2 flex items-center justify-center">
-                  <XIcon
-                    onClick={() => removeFile(file)}
-                    className="size-4 cursor-pointer"
-                  />
-                </div>
               </div>
-            ))}
-          </div>
+            </div>
+          ))}
+        </div>
 
-          <div
-            className="flex p-4 mb-4 text-sm text-blue-800 rounded-lg bg-blue-50 dark:bg-gray-800 dark:text-blue-400"
-            role="alert"
-          >
-            <svg
-              className="shrink-0 inline w-4 h-4 me-3 mt-[2px]"
-              aria-hidden="true"
-              xmlns="http://www.w3.org/2000/svg"
-              fill="currentColor"
-              viewBox="0 0 20 20"
+        <div className="flex p-4 mb-4 text-blue-800 rounded-lg bg-blue-50">
+          <Info className="mr-4" />
+
+          <div>
+            <span className="font-medium">Pravidla pre nahravanie fotiek:</span>
+            <ul className="mt-1.5 list-disc list-inside">
+              <li>Maximalna velkost: 10mb</li>
+              <li>Nevhodne subory budu zmazane</li>
+              <li>Maximalny pocet suborov: 10</li>
+              <li>
+                Fotky sa zobrazia po schvaleni administratorom (do 24h od
+                pridania)
+              </li>
+            </ul>
+
+            <Credenza
+              open={uploadDialogOpen}
+              onOpenChange={setUploadDialogOpen}
             >
-              <path d="M10 .5a9.5 9.5 0 1 0 9.5 9.5A9.51 9.51 0 0 0 10 .5ZM9.5 4a1.5 1.5 0 1 1 0 3 1.5 1.5 0 0 1 0-3ZM12 15H8a1 1 0 0 1 0-2h1v-3H8a1 1 0 0 1 0-2h2a1 1 0 0 1 1 1v4h1a1 1 0 0 1 0 2Z" />
-            </svg>
-            <span className="sr-only">Info</span>
-            <div>
-              <span className="font-medium">
-                Pravidla pre nahravanie fotiek:
-              </span>
-              <ul className="mt-1.5 list-disc list-inside">
-                <li>Maximalna velkost: 10mb</li>
-                <li>Nevhodne subory budu zmazane</li>
-                <li>Maximalny pocet suborov: 10</li>
-                <li>
-                  Fotky sa zobrazia po schvaleni administratorom (do 24h od
-                  pridania)
-                </li>
-              </ul>
-
-              <Credenza
-                open={uploadDialogOpen}
-                onOpenChange={setUploadDialogOpen}
-              >
-                <CredenzaTrigger asChild>
-                  <div className="flex justify-center mt-5">
-                    <button
-                      type="button"
-                      className="gap-2 text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center inline-flex items-center me-2"
-                    >
-                      <Upload size={"16"} /> Nahrat fotky
-                    </button>
-                  </div>
-                </CredenzaTrigger>
-                <CredenzaContent>
-                  {isUploading && <Loader />}
-                  <CredenzaHeader>
-                    <CredenzaTitle>Upload</CredenzaTitle>
-                    <CredenzaDescription>
-                      Vyberte subory pre nahranie.
-                    </CredenzaDescription>
-                  </CredenzaHeader>
-                  <CredenzaBody>
-                    <MediaUploader onChange={onChange} />
-                  </CredenzaBody>
-                  <CredenzaFooter>
-                    <Button
-                      onClick={async () => {
-                        await upload();
-                        setUploadDialogOpen(false);
-                      }}
-                    >
-                      <Upload /> Nahrat fotky
-                    </Button>
-                  </CredenzaFooter>
-                </CredenzaContent>
-              </Credenza>
-            </div>
+              <CredenzaTrigger asChild>
+                <div className="flex mt-5">
+                  <Button>
+                    <Upload size={"16"} /> Nahrat fotky
+                  </Button>
+                </div>
+              </CredenzaTrigger>
+              <CredenzaContent className="min-w-[750px]">
+                {isUploading && <Loader />}
+                <CredenzaHeader>
+                  <CredenzaTitle>Upload</CredenzaTitle>
+                  <CredenzaDescription>
+                    Vyberte subory pre nahranie.
+                  </CredenzaDescription>
+                </CredenzaHeader>
+                <CredenzaBody>
+                  <MediaUploader onChange={onChange} />
+                </CredenzaBody>
+                <CredenzaFooter>
+                  <Button
+                    disabled={files.length === 0}
+                    onClick={async () => {
+                      await upload();
+                      setUploadDialogOpen(false);
+                    }}
+                  >
+                    <Upload /> Nahrat fotky
+                  </Button>
+                </CredenzaFooter>
+              </CredenzaContent>
+            </Credenza>
           </div>
+        </div>
 
-          {lightboxDisplay && imageToShow && (
-            <div className="lightbox" onClick={hideLightBox}>
-              <picture data-icon="icon-heart" className="test">
-                <Image
-                  layout="fill"
-                  className="lightbox-img"
-                  alt={imageToShow.link}
-                  src={
-                    "/uploads/" + imageToShow.userId + "/" + imageToShow.link
-                  }
-                />
-              </picture>
+        {lightboxDisplay && imageToShow && (
+          <div className="lightbox" onClick={hideLightBox}>
+            <div className="nav-wrapper">
+              <div className="nav-prev cursor-pointer" onClick={showPrev}>
+                <ChevronLeft size={"28px"} color="#000000" />
+              </div>
+              <div className="nav-next cursor-pointer" onClick={showNext}>
+                <ChevronRight size={"28px"} color="#000000" />
+              </div>
             </div>
-          )}
-        
+
+            <picture className="lightbox-pict">
+              <Image
+                layout="fill"
+                className="lightbox-img"
+                alt={imageToShow.link}
+                src={"/uploads/" + imageToShow.userId + "/" + imageToShow.link}
+              />
+            </picture>
+          </div>
+        )}
       </CardContent>
     </Card>
   );

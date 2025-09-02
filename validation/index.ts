@@ -42,8 +42,8 @@ export const RegisterUser = z.object({
 });
 
 export const LoginUser = z.object({
-  email: emailValue,
-  password: stringValue,
+  email: z.string('Prosim zadajte "Meno"'),
+  password: z.string('Prosim zadajte "Heslo"'),
 });
 
 export const CreateQuestion = z.object({

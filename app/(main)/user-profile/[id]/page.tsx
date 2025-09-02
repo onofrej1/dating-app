@@ -8,7 +8,15 @@ import Image from "next/image";
 import { getUserPhotos } from "@/actions/files";
 import "./page.css";
 import { H3, H4, Small } from "@/components/typography";
-import { Calendar, CalendarIcon, Image as LucideImage, MapPin, Mars, User, Venus } from "lucide-react";
+import {
+  Calendar,
+  CalendarIcon,
+  Image as LucideImage,
+  MapPin,
+  Mars,
+  User,
+  Venus,
+} from "lucide-react";
 
 export default function ProfilePage() {
   const { data: session } = useSession();
@@ -93,21 +101,12 @@ export default function ProfilePage() {
   };
 
   return (
+    <>
     <div className="relative p-6 bg-white shadow-sm border border-slate-200 rounded-lg">
-      <div className="flex gap-8">
-        <div className="relative w-[200px] h-[200px]">
-          {selectedImage && (
-            <Image
-              layout="fill"
-              className="rounded-full border-1 border-gray-500 bg-white p-1 object-cover w-full h-full"
-              src={
-                "/uploads/" + selectedImage.userId + "/" + selectedImage.link
-              }
-              alt="@shadcn"
-            />
-          )}
-        </div>
-        <div className="flex-1 space-y-3">
+      <div className="border-gray-400 p-3 flex items-start gap-8 mb-4">
+        
+
+        <div className="flex-2 space-y-3">
           <div className="flex gap-3 items-center mb-3">
             <H3>{data?.userInfo["name"]}</H3>{" "}
             {data?.userInfo.gender === "man" ? <Mars /> : <Venus />}{" "}
@@ -149,35 +148,42 @@ export default function ProfilePage() {
               </div>
             </div>
           </div>
-
-          <H4 className="flex gap-3 items-baseline">Nahrane fotky <Small>Kliknutim na obrazok
-            zobrazite fotky v plnej velkosti</Small></H4>
-
-          {selectedImage && (
-            <div className="flex mt-4 gap-3 border-2 border-gray-300 p-2">
-              {images?.slice(2).map((file) => (
-                <div
-                  key={file.id}
-                  className="rounded-md relative w-[70px] h-[70px]"
-                >
-                  <Image
-                    layout={"fill"}
-                    className=" object-cover w-full h-full cursor-pointer"
-                    onClick={() => setSelectedImage(file)}
-                    //src={URL.createObjectURL(file)}
-                    //className="h-auto max-w-full rounded-lg"
-                    src={"/uploads/" + file.userId + "/" + file.link}
-                    alt=""
-                  />
-                </div>
-              ))}
-            </div>
-          )}
         </div>
       </div>
-      <div className="mt-4 flex flex-col gap-4">
 
-        <h3 className="mt-4 scroll-m-20 text-2xl font-semibold tracking-tight">
+      <H4 className="flex gap-3 items-baseline">
+        Nahrane fotky{" "}
+        {images && images.length > 0 && <Small>Kliknutim na obrazok zobrazite fotky v plnej velkosti</Small>}
+      </H4>
+
+      {images && images.length > 0 ? (
+        <div className="flex mt-4 gap-3 border-2 border-dashed border-gray-300 p-2">
+          {images?.map((file) => (
+            <div
+              key={file.id}
+              className="rounded-md relative w-[70px] h-[70px]"
+            >
+              <Image
+                layout={"fill"}
+                className=" object-cover w-full h-full cursor-pointer"
+                onClick={() => setSelectedImage(file)}
+                //src={URL.createObjectURL(file)}
+                //className="h-auto max-w-full rounded-lg"
+                src={"/uploads/" + file.userId + "/" + file.link}
+                alt=""
+              />
+            </div>
+          ))}
+        </div>
+      ) : <div>Uzivatel nepridal ziadne fotky</div>}
+
+      </div>
+      
+      <div className="mt-4 relative p-6 bg-white shadow-sm border border-slate-200 rounded-lg">
+
+
+      <div className="flex flex-col gap-4">
+        <h3 className="scroll-m-20 text-2xl font-semibold tracking-tight">
           Blizsie informácie
         </h3>
         <div className="flex gap-3">
@@ -206,5 +212,6 @@ export default function ProfilePage() {
         </div>
       </div>
     </div>
+    </>
   );
 }

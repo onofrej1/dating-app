@@ -53,7 +53,7 @@ export default function UsersPage() {
         }}
       />
 
-      <div className="mt-4">Výsledky vyhľadávania: {users?.length}</div>
+      <div className="mt-4">Výsledky vyhľadávania: {users?.length} zaznamov</div>
 
       <div className="p-4 mb-4 grid grid-cols-1 gap-3">
         {users?.map((user) => (
@@ -74,15 +74,12 @@ export default function UsersPage() {
             </div>
             <div className="p-3 flex-1">
               <h4 className="flex gap-2 items-center mb-2 text-slate-800 text-xl font-semibold">
-                {/*<User />*/} {user.name},{" "}
+                {user.name},{" "}
                 <span>{user.gender === "man" ? "muž" : "žena"}</span>
                 {user.gender === "man" ? <Mars /> : <Venus />}
               </h4>
               {/*<div className="mb-8 text-slate-600 leading-normal font-light">
-                Like so many organizations these days, Autodesk is a company in
-                transition. It was until recently a traditional boxed software
-                company selling licenses. Yet its own business model disruption
-                is only part of the story
+                Like so many organizations these days
               </div>*/}
               <div className="flex gap-2">
                 <div className="flex-1">

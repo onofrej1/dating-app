@@ -150,12 +150,12 @@ export default function UserPage() {
                 onOpenChange={setHobbyDialogOpen}
               >                
                 <CredenzaContent>
-                  <CredenzaHeader>
+                  {/*<CredenzaHeader>
                     <CredenzaTitle>Zaujmy</CredenzaTitle>
                     <CredenzaDescription>
                       Vyberte zaujmy zo zoznamu.
                     </CredenzaDescription>
-                  </CredenzaHeader>
+                  </CredenzaHeader>*/}
                   <CredenzaBody>{fields["hobby"]}</CredenzaBody>
                   <CredenzaFooter>
                     <Button

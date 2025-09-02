@@ -1,9 +1,16 @@
-import { Home, Search, Upload } from "lucide-react";
+'use client'
+import { Home, LogOut, Search, Upload } from "lucide-react";
 import Footer from "./_components/footer";
 import { Navbar } from "./_components/navbar";
 import Image from "next/image";
+import { H3 } from "@/components/typography";
+import Link from "next/link";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { useSession } from "@/lib/auth-client";
 
 export default function Layout({ children }: { children: React.ReactNode }) {
+  const { data } = useSession();
+
   return (
     <div>
       <Navbar />
@@ -24,34 +31,35 @@ export default function Layout({ children }: { children: React.ReactNode }) {
           <div className="relative self-start flex flex-col my-6 bg-white shadow-sm border border-slate-200 rounded-lg w-96">
             <div className="mx-3 mb-0 border-b border-slate-200 pt-3 pb-2 px-1">
               <h5 className="items-center flex gap-3 mb-2 text-slate-800 text-xl font-semibold">
-                <div className="relative w-10 h-10 overflow-hidden bg-gray-100 rounded-full dark:bg-gray-600">
-                  <svg
-                    className="absolute w-12 h-12 text-gray-400 -left-1"
-                    fill="currentColor"
-                    viewBox="0 0 20 20"
-                    xmlns="http://www.w3.org/2000/svg"
-                  >
-                    <path
-                      fillRule="evenodd"
-                      d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z"
-                      clipRule="evenodd"
-                    ></path>
-                  </svg>
-                </div>
-                John (johndoe@example.com)
+                <Avatar>
+                  <AvatarImage src="https://github.com/shadcn.png" />
+                  <AvatarFallback>CN</AvatarFallback>
+                </Avatar>
+                {data?.user.name} ({data?.user.email})
               </h5>
             </div>
 
-            <div className="p-4 flex flex-col gap-3">
-              <h5 className="flex gap-3 mb-2 text-slate-800 text-xl font-semibold">
-                <Home /> Môj profil
-              </h5>
-              <h5 className="flex gap-3 mb-2 text-slate-800 text-xl font-semibold">
-                <Upload /> Nahrať fotky
-              </h5>
-              <h5 className="flex gap-3 mb-2 text-slate-800 text-xl font-semibold">
-                <Search /> Vyhľadávanie
-              </h5>
+            <div className="p-4 flex flex-col gap-4">
+              <Link href="/profile">
+                <H3 className="flex gap-3 items-center">
+                  <Home /> Môj profil
+                </H3>
+              </Link>
+              <Link href="/photos">
+                <H3 className="flex gap-3 items-center">
+                  <Upload /> Nahrať fotky
+                </H3>
+              </Link>
+              <Link href="/users">
+                <H3 className="flex gap-3 items-center">
+                  <Search /> Vyhľadávanie
+                </H3>
+              </Link>
+              <Link href="/signout">
+                <H3 className="flex gap-3 items-center">
+                  <LogOut color="#000000" /> Odhlasit
+                </H3>
+              </Link>
             </div>
             <p className="text-slate-600 leading-normal font-light"></p>
           </div>

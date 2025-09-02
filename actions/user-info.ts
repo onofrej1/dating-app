@@ -1,7 +1,7 @@
 "use server";
 
 import { prisma } from "@/db/prisma";
-import { Region } from "@/generated/prisma";
+import { Region, User } from "@/generated/prisma";
 import { auth } from "@/lib/auth";
 import { headers } from "next/headers";
 
@@ -26,20 +26,19 @@ export async function getUserInfo(id?: string) {
     },
   });
 
-  const baseUserInfo = {
+  const baseUserInfo: Partial<User> = {
     name: user.name,
     bio: user.bio,
     createdAt: user.createdAt,
     lastLogin: user.lastLogin,
-    userLocation: userLocation,
     gender: user.gender,
     genderSearch: user.genderSearch,
   };
 
   if (userId === session.user.id) {
-    /*baseUserInfo.email = user.email;
-    baseUserInfo.emailVerified = user.email;
-    baseUserInfo.dob = user.dob;*/
+    baseUserInfo.email = user.email;
+    baseUserInfo.emailVerified = user.emailVerified;
+    baseUserInfo.dob = user.dob;
   }
 
   const userInfo = await prisma.userInfo.findMany({
